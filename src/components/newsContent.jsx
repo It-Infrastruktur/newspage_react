@@ -11,9 +11,15 @@ function PrepareContent({currentNewsPageID, setSnackbar, language, setSpinner, s
         async function updateNewsPage() {
             try {
                 setSpinner(true);
-                const {articles} = await awsQueryHeadlines(currentNewsPageID);
-                setArticles(articles);
-                QuerySuccess(articles);
+                const response = await awsQueryHeadlines(currentNewsPageID);
+                if(response.message){
+                    QueryFailed();
+                }else {
+                    const {articles} = response;
+                    setArticles(articles);
+                    QuerySuccess(articles);
+                }
+
             } catch (e) {
                 QueryFailed();
             }
@@ -39,6 +45,7 @@ function PrepareContent({currentNewsPageID, setSnackbar, language, setSpinner, s
             message: language === 'de' ? `Fehler beim Darstellen der News` : `Error while displaying the news`
         });
     };
+
     return (
         <>
             {articles.error ? ErrorImage() : <RenderHeadlines articles={articles}/>}
